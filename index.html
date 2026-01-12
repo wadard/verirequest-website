@@ -1,17 +1,193 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>VeriRequest — Specialists in Data Subject Access Requests</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <title>VeriRequest — DSAR Support for Organisations</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
+
 <body>
 
-  <header class="hero">
-    <h1>VeriRequest — Specialists in Data Subject Access Requests</h1>
-    <p>Fast, compliant DSAR support for individuals and SMEs.</p>
-  </header>
+  <!-- NAVIGATION -->
+  <nav class="navbar">
+    <div class="container nav-inner">
+      <div class="logo-placeholder"></div>
+      <div class="nav-links">
+        <a href="#who-we-help">Who We Help</a>
+        <a href="#services">Services</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- HERO -->
+    <section id="hero" class="fade-section">
+      <div class="animated-bg"></div>
+
+      <div class="container hero-grid">
+        <div class="hero-text">
+          <h1>Practical DSAR support you can rely on.</h1>
+          <p class="section-subtitle">
+            Clear, structured support for Data Subject Access Requests — delivered with speed, consistency, and GDPR‑aligned processes.
+          </p>
+          <div class="hero-actions">
+            <a href="#contact" class="btn btn-primary">Request DSAR Support</a>
+            <a href="#how-it-works" class="btn btn-secondary">See How We Work</a>
+          </div>
+        </div>
+        <div class="hero-side"></div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- WHO WE HELP -->
+    <section id="who-we-help" class="fade-section alt-bg">
+      <div class="container">
+        <h2>Who We Help</h2>
+        <p class="section-subtitle">
+          Organisations trust us when DSARs become complex, urgent, or resource‑intensive.
+        </p>
+        <p>
+          We support UK organisations of all sizes — from SMEs, schools, and charities to healthcare providers and public sector teams.
+          Whether you handle DSARs occasionally or regularly, we provide dependable, operational support that fits your workflow.
+        </p>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- SERVICES -->
+    <section id="services" class="fade-section">
+      <div class="container">
+        <h2>Our Core Services</h2>
+        <p class="section-subtitle">
+          Clear, consistent DSAR support tailored to your organisation.
+        </p>
+
+        <div class="services-grid">
+
+          <div class="service-card">
+            <h3>DSAR Redaction</h3>
+            <p>
+              We apply consistent redaction across documents, emails, and data exports, removing third‑party information professionally and clearly.
+            </p>
+          </div>
+
+          <div class="service-card">
+            <h3>DSAR Triage</h3>
+            <p>
+              We help you understand the operational scope of a request and outline a manageable plan based on common GDPR practices.
+            </p>
+          </div>
+
+          <div class="service-card">
+            <h3>Response Drafting</h3>
+            <p>
+              We prepare structured DSAR response drafts and supporting documentation, ready for your review and approval.
+            </p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- WHY CHOOSE US -->
+    <section id="why-choose-us" class="fade-section alt-bg">
+      <div class="container">
+        <h2>Why Organisations Choose VeriRequest</h2>
+        <p class="section-subtitle">
+          Practical support, predictable outcomes, and clear communication.
+        </p>
+        <ul class="why-list">
+          <li>UK‑based DSAR support</li>
+          <li>GDPR‑informed workflows</li>
+          <li>Fast, predictable turnaround</li>
+          <li>Fixed, transparent pricing</li>
+          <li>Flexible, on‑demand support — no mandatory retainers</li>
+          <li>Clear communication throughout</li>
+        </ul>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- HOW IT WORKS -->
+    <section id="how-it-works" class="fade-section">
+      <div class="container">
+        <h2>How It Works</h2>
+        <p class="section-subtitle">
+          A simple, structured process designed to reduce complexity.
+        </p>
+
+        <ol>
+          <li>
+            <strong>Submit your request</strong><br />
+            Share the details of your DSAR and any relevant files securely.
+          </li>
+          <li>
+            <strong>We review and scope</strong><br />
+            You receive a clear plan and fixed price before any work begins.
+          </li>
+          <li>
+            <strong>We deliver your DSAR output</strong><br />
+            Redacted files, triage notes, or a full draft response — delivered professionally and ready for your approval.
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <div class="section-divider"></div>
+
+    <!-- CONTACT -->
+    <section id="contact" class="fade-section alt-bg">
+      <div class="container">
+        <h2>Request DSAR Support</h2>
+        <p class="section-subtitle">
+          Send us the details of your request and we’ll respond promptly.
+        </p>
+
+        <form name="dsar-support" method="POST" data-netlify="true">
+          <div>
+            <label for="name">Name</label><br />
+            <input type="text" id="name" name="name" required />
+          </div>
+
+          <div>
+            <label for="email">Email</label><br />
+            <input type="email" id="email" name="email" required />
+          </div>
+
+          <div>
+            <label for="organisation">Organisation</label><br />
+            <input type="text" id="organisation" name="organisation" />
+          </div>
+
+          <div>
+            <label for="message">What do you need help with?</label><br />
+            <textarea id="message" name="message" rows="5" required></textarea>
+          </div>
+
+          <button type="submit" class="btn btn-primary">Submit Request</button>
+        </form>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+      <p class="disclaimer">
+        VeriRequest provides operational DSAR support services and does not offer legal advice.
+      </p>
+    </div>
+  </footer>
 
 </body>
 </html>
