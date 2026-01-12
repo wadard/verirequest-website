@@ -1,11 +1,11 @@
 /* COLOUR SYSTEM — NETLIFY‑INSPIRED */
 :root {
-  --primary-blue: #0B1F33;      /* Deep navy */
-  --secondary-blue: #1A73E8;    /* Modern blue accent */
-  --accent-teal: #00C7B7;       /* Netlify teal */
+  --primary-blue: #0B1F33;
+  --secondary-blue: #1A73E8;
+  --accent-teal: #00C7B7;
 
-  --bg-light: #F4F7FA;          /* Soft grey-white */
-  --grey-mid: #D3D9E1;          /* Cool grey */
+  --bg-light: #F4F7FA;
+  --grey-mid: #D3D9E1;
   --text-dark: #1A1A1A;
   --white: #FFFFFF;
 }
@@ -41,6 +41,13 @@ h1, h2, h3 {
   padding: 0 1.5rem;
 }
 
+/* LOGO */
+.logo {
+  height: 35px;
+  width: auto;
+  display: block;
+}
+
 /* NAVIGATION */
 .navbar {
   background: var(--primary-blue);
@@ -55,13 +62,6 @@ h1, h2, h3 {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 0;
-}
-
-.logo-placeholder {
-  width: 120px;
-  height: 40px;
-  background-color: rgba(255,255,255,0.4);
-  border-radius: 4px;
 }
 
 .nav-links a {
