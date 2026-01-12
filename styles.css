@@ -1,11 +1,11 @@
 /* NETLIFY‑INSPIRED COLOUR SYSTEM */
 :root {
-  --primary-blue: #0B1F33;      /* Deep navy */
-  --secondary-blue: #1A73E8;    /* Modern blue */
-  --accent-teal: #00C7B7;       /* Netlify teal */
+  --primary-blue: #0B1F33;
+  --secondary-blue: #1A73E8;
+  --accent-teal: #00C7B7;
 
-  --bg-light: #F4F7FA;          /* Soft grey-white */
-  --grey-mid: #D3D9E1;          /* Cool grey */
+  --bg-light: #F4F7FA;
+  --grey-mid: #D3D9E1;
   --text-dark: #1A1A1A;
   --white: #FFFFFF;
 }
@@ -133,7 +133,7 @@ h1, h2, h3 { color: var(--primary-blue); margin-top: 0; }
   border-radius: 8px;
 }
 
-/* BUTTONS — UPDATED THEME */
+/* BUTTONS — UPDATED TO TEAL */
 .btn {
   display: inline-block;
   padding: 0.75rem 1.5rem;
@@ -144,12 +144,12 @@ h1, h2, h3 { color: var(--primary-blue); margin-top: 0; }
 }
 
 .btn-primary {
-  background-color: var(--secondary-blue);
+  background-color: var(--accent-teal);
   color: var(--white);
 }
 
 .btn-primary:hover {
-  background-color: #155fcc;
+  background-color: #009e92;
   transform: translateY(-2px);
 }
 
@@ -181,41 +181,6 @@ section { padding: 5rem 1.5rem; }
     transparent
   );
   margin: 0;
-}
-
-/* SECTION HEADERS */
-section h2 {
-  position: relative;
-  padding-bottom: 0.5rem;
-  margin-bottom: 2rem;
-}
-
-section h2::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 60px;
-  height: 3px;
-  background-color: var(--accent-teal);
-  border-radius: 2px;
-  transition: width 0.3s ease;
-}
-
-section:hover h2::after { width: 120px; }
-
-/* FADE-IN ANIMATION */
-.fade-section {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeUp 0.8s ease forwards;
-}
-
-@keyframes fadeUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 /* SERVICES GRID */
