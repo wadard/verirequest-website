@@ -4,6 +4,10 @@
   <meta charset="UTF-8" />
   <title>VeriRequest — DSAR Support for Organisations</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+
   <link rel="stylesheet" href="styles.css" />
 </head>
 
@@ -14,8 +18,17 @@
     <div class="container nav-inner">
 
       <!-- LOGO -->
-      <img src="assets/images/logo.png" alt="VeriRequest logo" class="logo">
+      <img src="assets/images/logo.png"
+           alt="VeriRequest logo"
+           class="logo"
+           decoding="async">
 
+      <!-- MOBILE MENU BUTTON -->
+      <button class="nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+
+      <!-- NAV LINKS -->
       <div class="nav-links">
         <a href="#who-we-help">Who We Help</a>
         <a href="#services">Services</a>
@@ -30,6 +43,7 @@
     <!-- HERO -->
     <section id="hero" class="fade-section">
       <div class="animated-bg"></div>
+      <div class="wave-overlay"></div>
 
       <div class="container hero-grid">
         <div class="hero-text">
@@ -43,11 +57,12 @@
           </div>
         </div>
 
-        <!-- HERO IMAGE -->
         <div class="hero-side">
           <img src="assets/images/module_image_1.png"
                alt="DSAR support illustration"
-               class="hero-side-image">
+               class="hero-side-image"
+               loading="lazy"
+               decoding="async">
         </div>
       </div>
     </section>
@@ -107,28 +122,8 @@
 
     <div class="section-divider"></div>
 
-    <!-- WHY CHOOSE US -->
-    <section id="why-choose-us" class="fade-section alt-bg">
-      <div class="container">
-        <h2>Why Organisations Choose VeriRequest</h2>
-        <p class="section-subtitle">
-          Practical support, predictable outcomes, and clear communication.
-        </p>
-        <ul class="why-list">
-          <li>UK‑based DSAR support</li>
-          <li>GDPR‑informed workflows</li>
-          <li>Fast, predictable turnaround</li>
-          <li>Fixed, transparent pricing</li>
-          <li>Flexible, on‑demand support — no mandatory retainers</li>
-          <li>Clear communication throughout</li>
-        </ul>
-      </div>
-    </section>
-
-    <div class="section-divider"></div>
-
     <!-- HOW IT WORKS -->
-    <section id="how-it-works" class="fade-section">
+    <section id="how-it-works" class="fade-section alt-bg">
       <div class="container">
         <h2>How It Works</h2>
         <p class="section-subtitle">
@@ -155,7 +150,7 @@
     <div class="section-divider"></div>
 
     <!-- CONTACT -->
-    <section id="contact" class="fade-section alt-bg">
+    <section id="contact" class="fade-section">
       <div class="container">
         <h2>Request DSAR Support</h2>
         <p class="section-subtitle">
@@ -163,6 +158,8 @@
         </p>
 
         <form name="dsar-support" method="POST" data-netlify="true">
+          <input type="hidden" name="form-name" value="dsar-support">
+
           <div>
             <label for="name">Name</label><br />
             <input type="text" id="name" name="name" required />
@@ -193,10 +190,33 @@
   <footer>
     <div class="container">
       <p class="disclaimer">
-        VeriRequest provides operational DSAR support services and does not offer legal advice.
+        © 2026 VeriRequest — Operational DSAR Support<br>
+        VeriRequest provides practical DSAR support services and does not offer legal advice.
       </p>
     </div>
   </footer>
+
+  <!-- MOBILE NAV SCRIPT -->
+  <script>
+    const toggle = document.querySelector('.nav-toggle');
+    const links = document.querySelector('.nav-links');
+
+    toggle.addEventListener('click', () => {
+      links.classList.toggle('open');
+    });
+
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        links.classList.remove('open');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.nav-inner')) {
+        links.classList.remove('open');
+      }
+    });
+  </script>
 
 </body>
 </html>
