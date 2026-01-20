@@ -1,0 +1,18 @@
+# Ignore data files
+data/
+*/data/
+
+# Ignore scraper automation
+scraper/
+*/scraper/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Environment files
+.env
+*.env
+
+# macOS junk
+.DS_Store
