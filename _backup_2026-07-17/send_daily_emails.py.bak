@@ -1,0 +1,323 @@
+#!/usr/bin/env python3
+import csv
+import datetime as dt
+import random
+import sys
+import time
+from pathlib import Path
+import requests
+import json
+
+# ========= CONFIG =========
+
+SCRIPT_DIR = Path("/Users/jakewoodward/Desktop/verirequest-website/scraper")
+
+SCHOOLS_CSV = SCRIPT_DIR.parent / "data" / "school_emails_final_clean.csv"
+LOG_CSV = SCRIPT_DIR.parent / "data" / "email_send_log.csv"
+UNSUBSCRIBE_CSV = SCRIPT_DIR.parent / "data" / "unsubscribe_list.csv"
+
+EMAILS_PER_DAY = 7
+
+# *** YOUR REAL CREDENTIALS — DO NOT OVERWRITE THESE ***
+TENANT_ID = "REDACTED"
+CLIENT_ID = "REDACTED"
+CLIENT_SECRET = "REDACTED"
+SENDER = "jake.woodward@comms.verirequest.co.uk"
+
+# *** DO NOT RE‑ADD PLACEHOLDERS BELOW ***
+
+# New unified morning window
+SEND_START = dt.time(8, 0)
+SEND_END = dt.time(9, 0)
+
+# ========= HELPERS =========
+
+def now_local():
+    return dt.datetime.now()
+
+def parse_recipients(raw):
+    emails = [e.strip() for e in raw.split(";") if e.strip()]
+    valid = [e for e in emails if "@" in e and "." in e]
+    return valid
+
+def load_unsubscribed():
+    unsub = set()
+    if not UNSUBSCRIBE_CSV.exists():
+        return unsub
+    with UNSUBSCRIBE_CSV.open() as f:
+        for line in f:
+            email = line.strip().lower()
+            if email:
+                unsub.add(email)
+    return unsub
+
+def any_recipient_unsubscribed(raw_email, unsub_set):
+    for addr in parse_recipients(raw_email):
+        if addr.lower() in unsub_set:
+            return True
+    return False
+
+# ========= GRAPH API WITH TOKEN DEBUGGING =========
+
+def graph_send_email(to_addrs, subject, body):
+    token_url = f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token"
+    token_data = {
+        "client_id": CLIENT_ID,
+        "scope": "https://graph.microsoft.com/.default",
+        "client_secret": CLIENT_SECRET,
+        "grant_type": "client_credentials",
+    }
+
+    token_r = requests.post(token_url, data=token_data)
+
+    # === DEBUG OUTPUT ===
+    print("\n=== TOKEN DEBUG ===")
+    print("Status:", token_r.status_code)
+    print("Raw body (first 500 chars):")
+    print(token_r.text[:500])
+    print("===================\n")
+
+    if token_r.status_code != 200:
+        return False, f"Token error: {token_r.status_code} {token_r.text}"
+
+    try:
+        token = token_r.json().get("access_token")
+    except Exception as e:
+        return False, f"Token JSON parse error: {e} | Body: {token_r.text[:500]}"
+
+    if not token:
+        return False, f"Failed to obtain access token. Raw body: {token_r.text[:500]}"
+
+    email = {
+        "message": {
+            "subject": subject,
+            "body": {"contentType": "Text", "content": body},
+            "toRecipients": [{"emailAddress": {"address": addr}} for addr in to_addrs],
+            "from": {"emailAddress": {"address": SENDER}},
+        },
+        "saveToSentItems": True,
+    }
+
+    send_url = f"https://graph.microsoft.com/v1.0/users/{SENDER}/sendMail"
+    headers = {"Authorization": f"Bearer {token}", "Content-Type": "application/json"}
+
+    r = requests.post(send_url, headers=headers, data=json.dumps(email))
+
+    if r.status_code == 202:
+        return True, ""
+    else:
+        return False, f"Send error: {r.status_code} {r.text}"
+
+def send_email(to_addrs, body, subject):
+    return graph_send_email(to_addrs, subject, body)
+
+def load_log():
+    sent = set()
+    if LOG_CSV.exists():
+        with LOG_CSV.open(newline="", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if row.get("Status") == "SENT":
+                    sent.add(row["SchoolWebsite"])
+    return sent
+
+def append_log(school_website, email, status):
+    LOG_CSV.parent.mkdir(parents=True, exist_ok=True)
+    file_exists = LOG_CSV.exists()
+    with LOG_CSV.open("a", newline="", encoding="utf-8") as f:
+        fieldnames = ["SchoolWebsite", "FinalEmail", "SentTimestamp", "Status"]
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        if not file_exists:
+            writer.writeheader()
+        writer.writerow({
+            "SchoolWebsite": school_website,
+            "FinalEmail": email,
+            "SentTimestamp": now_local().isoformat(),
+            "Status": status,
+        })
+
+def load_candidates(sent_already, unsubscribed):
+    candidates = []
+    with SCHOOLS_CSV.open(newline="", encoding="utf-8") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            site = row["SchoolWebsite"]
+            email = row["FinalEmail"]
+            if not email:
+                continue
+            if any_recipient_unsubscribed(email, unsubscribed):
+                continue
+            if site not in sent_already:
+                candidates.append((site, email))
+    return candidates[:EMAILS_PER_DAY]
+
+# ========= NEW UNIFIED SCHEDULER (08:00–09:00 ONLY) =========
+
+def schedule_times(n):
+    today = now_local().date()
+
+    def rand_time(start, end):
+        start_dt = dt.datetime.combine(today, start)
+        end_dt = dt.datetime.combine(today, end)
+        delta = (end_dt - start_dt).seconds
+        offset = random.randint(0, delta)
+        return start_dt + dt.timedelta(seconds=offset)
+
+    slots = [rand_time(SEND_START, SEND_END) for _ in range(n)]
+    slots.sort()
+    return slots
+
+# ========= EMAIL VARIANTS (unchanged) =========
+
+def build_body(variant):
+    if variant == 1:
+        return (
+            "Hi,\n\n"
+            "I'm contacting you as several schools have recently requested support with DSARs that include safeguarding material, "
+            "multi‑pupil references, or sensitive chronology work.\n\n"
+            "Where a request becomes time‑consuming or complex, I provide operational DSAR support — triage, redaction, chronology preparation, "
+            "and assembling a compliant response pack in line with ICO expectations. The aim is simply to reduce the workload on DSLs and admin teams.\n\n"
+            "If it would be helpful, I can share a short safeguarding‑DSAR checklist that schools use to structure their approach. "
+            "Reply CHECKLIST if you'd like it.\n\n"
+            "Kind regards,\n\n"
+            "Jake Woodward\n"
+            "DSAR & Information Governance Support Lead\n"
+            "VeriRequest – Operational DSAR Support\n"
+            "jake.woodward@comms.verirequest.co.uk\n"
+            "verirequest.co.uk\n"
+        )
+
+    if variant == 2:
+        return (
+            "Hi,\n\n"
+            "A number of schools have recently asked for support with DSARs involving multiple pupils, shared email threads, or overlapping safeguarding references.\n\n"
+            "I provide operational DSAR support when requests become resource‑intensive — including redaction, triage, chronology work, "
+            "and preparing a compliant response pack aligned with ICO expectations.\n\n"
+            "If you'd find it useful, I can share a brief outline of how schools typically structure multi‑pupil DSAR responses. "
+            "Reply OUTLINE if you'd like it.\n\n"
+            "Kind regards,\n\n"
+            "Jake Woodward\n"
+            "DSAR & Information Governance Support Lead\n"
+            "VeriRequest – Operational DSAR Support\n"
+            "jake.woodward@comms.verirequest.co.uk\n"
+            "verirequest.co.uk\n"
+        )
+
+    if variant == 3:
+        return (
+            "Hi,\n\n"
+            "Some schools have recently requested support with DSARs linked to staff grievances or capability processes, "
+            "as these often involve large volumes of internal email correspondence and sensitive material.\n\n"
+            "I provide operational DSAR support — triage, redaction, chronology preparation, and assembling a compliant response pack "
+            "in line with ICO expectations — to reduce the workload on admin teams and senior leaders.\n\n"
+            "If helpful, I can share a short guide on structuring DSARs linked to staff matters. "
+            "Reply STAFF if you'd like it.\n\n"
+            "Kind regards,\n\n"
+            "Jake Woodward\n"
+            "DSAR & Information Governance Support Lead\n"
+            "VeriRequest – Operational DSAR Support\n"
+            "jake.woodward@comms.verirequest.co.uk\n"
+            "verirequest.co.uk\n"
+        )
+
+    if variant == 4:
+        return (
+            "Hi,\n\n"
+            "Several schools have recently asked for support with DSARs involving large volumes of email correspondence, "
+            "particularly where safeguarding references or multi‑pupil content appear across multiple threads.\n\n"
+            "I provide operational DSAR support — including email triage, redaction, chronology preparation, and assembling a compliant response pack "
+            "aligned with ICO expectations — to reduce the workload on admin teams.\n\n"
+            "If you'd like a short checklist for managing high‑volume email DSARs, reply EMAILS.\n\n"
+            "Kind regards,\n\n"
+            "Jake Woodward\n"
+            "DSAR & Information Governance Support Lead\n"
+            "VeriRequest – Operational DSAR Support\n"
+            "jake.woodward@comms.verirequest.co.uk\n"
+            "verirequest.co.uk\n"
+        )
+
+# ========= MAIN ENGINE =========
+
+def test_send():
+    print("=== TEST SEND MODE (Graph API) ===")
+    to = ["jawoodward@hotmail.co.uk"]
+    subject = "Data Subject Access Request Support"
+    body = build_body(1)
+
+    ok, err = send_email(to, body, subject)
+    if ok:
+        print("[TEST SENT] Email delivered successfully.")
+    else:
+        print("[TEST FAILED]", err)
+
+def main():
+    if "--test" in sys.argv:
+        test_send()
+        return
+
+    print("=== DAILY OUTBOUND ENGINE (VeriRequest, Graph API) ===")
+
+    today = now_local().date()
+    if today.weekday() >= 5:
+        print("[INFO] Weekend detected. No emails will be sent.")
+        return
+
+    unsubscribed = load_unsubscribed()
+    sent_already = load_log()
+    candidates = load_candidates(sent_already, unsubscribed)
+
+    if not candidates:
+        print("[INFO] No unsent schools available (or all filtered by unsubscribe).")
+        return
+
+    print(f"[INFO] Preparing to send {len(candidates)} emails today.")
+
+    send_times = schedule_times(len(candidates))
+    now = now_local()
+
+    if now > send_times[-1]:
+        print("[FATAL] Current time is past the last scheduled window. Run earlier.")
+        return
+
+    daily_summary = []
+
+    for (school_site, raw_email), send_at in zip(candidates, send_times):
+        now = now_local()
+        if now < send_at:
+            wait_sec = (send_at - now).total_seconds()
+            print(f"[INFO] Waiting {int(wait_sec)}s until {send_at.time()} for {raw_email} ({school_site})")
+            time.sleep(wait_sec)
+
+        if any_recipient_unsubscribed(raw_email, unsubscribed):
+            print(f"[SKIP] {raw_email} ({school_site}) is unsubscribed at send time.")
+            append_log(school_site, raw_email, "UNSUBSCRIBED_SKIP")
+            daily_summary.append((raw_email, school_site, "UNSUBSCRIBED_SKIP"))
+            continue
+
+        recipients = parse_recipients(raw_email)
+        if not recipients:
+            print(f"[FAIL] No valid recipients for {school_site}")
+            append_log(school_site, raw_email, "FAILED")
+            daily_summary.append((raw_email, school_site, "FAILED"))
+            continue
+
+        variant = random.randint(1, 4)
+        subject = "Data Subject Access Request Support"
+        body = build_body(variant)
+
+        ok, err = send_email(recipients, body, subject)
+        if ok:
+            print(f"[SENT] {raw_email} ({school_site}) variant={variant} at {now_local().time()}")
+            append_log(school_site, f"{raw_email} | variant={variant}", "SENT")
+            daily_summary.append((raw_email, school_site, f"SENT (variant {variant})"))
+        else:
+            print(f"[FAIL] {raw_email} ({school_site}) → {err}")
+            append_log(school_site, raw_email, "FAILED")
+            daily_summary.append((raw_email, school_site, "FAILED"))
+
+    print("\n=== DAILY SUMMARY ===")
+    for email, site, status in daily_summary:
+        print(f"{email} ({site}) → {status}")
+
+if __name__ == "__main__":
+    main()

@@ -16,3 +16,6 @@ __pycache__/
 
 # macOS junk
 .DS_Store
+
+# Local backups — never commit
+_backup*/
