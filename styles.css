@@ -696,6 +696,13 @@ footer .disclaimer {
   margin: 0;
 }
 
+.footer-link {
+  color: var(--teal);
+  text-decoration: none;
+}
+
+.footer-link:hover { text-decoration: underline; }
+
 .back-to-top {
   color: var(--teal);
   text-decoration: none;
