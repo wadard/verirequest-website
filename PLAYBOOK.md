@@ -73,6 +73,19 @@ Secondary channels: SBM Facebook/forum communities (ISBL, SBM Twitter/X, EduPeop
 
 **Metrics that matter:** replies per 100 sends (target ≥2 once running; below 1 after 300 sends = change the copy again), checklist downloads (Cloudflare analytics), quotes issued, quote→win rate. Ignore vanity metrics.
 
+## 7b. The decline rule (protects the day job and the reputation)
+
+A SAR doesn't care that it's month-end at work. Decide *before* the first enquiry what you'll say no to, so the decision takes ten seconds, not a sleepless night.
+
+Take the job only if **all three** are true:
+1. **Effort ≤ ~10 hours of your time** (roughly: one pupil file plus up to ~2 years of email; not a five-year multi-child email trawl)
+2. **At least 7 days between your start and their deadline** (with the school able to extend if the request is complex — remind them they can)
+3. **Not landing in a week you already know is dead** (month-end run, holidays)
+
+If any fail: reply the same day with a fast, honest no — "This one's bigger than I can turn round well in your window; here's what I'd do in your shoes" — and point them at the checklist and, where relevant, a DPO provider. A quick honest no gets remembered kindly; a late delivery gets you a complaint to the ICO.
+
+Published from-prices: Redaction from £295, Full response support from £595, triage free. First three quotes will teach you whether these are right.
+
 ## 8. When a reply comes in (the whole game)
 
 1. Respond within 2 hours, even just "I'm on it — scope questions coming this afternoon."
